@@ -1,3 +1,5 @@
+const https = require('https');
+
 exports.handler = async (event, context) => {
   // Handle CORS preflight requests
   if (event.httpMethod === 'OPTIONS') {
@@ -37,23 +39,50 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Make request to OpenRouter API
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    // Make request to OpenRouter API using https module
+    const postData = JSON.stringify(requestBody);
+    
+    const options = {
+      hostname: 'openrouter.ai',
+      port: 443,
+      path: '/api/v1/chat/completions',
       method: 'POST',
       headers: {
         'Authorization': 'Bearer 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',
         'Content-Type': 'application/json',
         'HTTP-Referer': 'https://aikidsapp.netlify.app',
-        'X-Title': 'AI Kids App'
-      },
-      body: JSON.stringify(requestBody)
+        'X-Title': 'AI Kids App',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const response = await new Promise((resolve, reject) => {
+      const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (chunk) => {
+          data += chunk;
+        });
+        res.on('end', () => {
+          resolve({
+            statusCode: res.statusCode,
+            data: data
+          });
+        });
+      });
+
+      req.on('error', (error) => {
+        reject(error);
+      });
+
+      req.write(postData);
+      req.end();
     });
 
-    if (!response.ok) {
-      throw new Error(`OpenRouter API error: ${response.status}`);
+    if (response.statusCode !== 200) {
+      throw new Error(`OpenRouter API error: ${response.statusCode}`);
     }
 
-    const data = await response.json();
+    const data = JSON.parse(response.data);
 
     return {
       statusCode: 200,
