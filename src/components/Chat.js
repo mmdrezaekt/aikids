@@ -20,16 +20,14 @@ const Chat = ({ onGenerationChange }) => {
     onGenerationChange && onGenerationChange(true);
     
     try {
-      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      const response = await fetch('https://api.novita.ai/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer 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',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:3000',
-          'X-Title': 'AI Kids App'
+          'Authorization': 'Bearer sk_WHtMEr6fX8C6OStB14DhDZ7aKD1gbi_r5hHZ4JKtZYk',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'deepseek/deepseek-r1:free',
+          model: 'qwen/qwen3-4b-fp8',
           messages: [
             {
               role: 'system',
@@ -44,7 +42,7 @@ const Chat = ({ onGenerationChange }) => {
               content: userMessage.content
             }
           ],
-          max_tokens: 300,
+          max_tokens: 1000,
           temperature: 0.7
         })
       });
