@@ -1,6 +1,24 @@
 [build]
   publish = "build"
   command = "npm run build"
+  functions = "netlify/functions"
+
+# API proxy for CORS issues using Netlify Functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/openrouter-proxy"
+  status = 200
+
+[[redirects]]
+  from = "/novita/*"
+  to = "/.netlify/functions/novita-proxy"
+  status = 200
+
+# SPA fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"
