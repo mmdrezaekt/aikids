@@ -23,7 +23,7 @@ const Chat = ({ onGenerationChange }) => {
       const response = await fetch('https://api.novita.ai/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer sk_WHtMEr6fX8C6OStB14DhDZ7aKD1gbi_r5hHZ4JKtZYk',
+          'Authorization': `Bearer ${process.env.REACT_APP_NOVITA_API_KEY || 'sk_WHtMEr6fX8C6OStB14DhDZ7aKD1gbi_r5hHZ4JKtZYk'}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({

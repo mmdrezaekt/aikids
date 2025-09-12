@@ -68,6 +68,22 @@ src/
 └── index.css             # استایل‌های عمومی
 ```
 
+## تنظیم Environment Variables
+
+برای استفاده از API ها، فایل `.env.local` در ریشه پروژه ایجاد کنید:
+
+```bash
+# Novita API Key (برای تولید متن و تصویر)
+REACT_APP_NOVITA_API_KEY=your_novita_api_key_here
+
+# OpenRouter API Key (پشتیبان)
+REACT_APP_OPENROUTER_API_KEY=your_openrouter_api_key_here
+```
+
+### نحوه دریافت API Key:
+1. **Novita**: [novita.ai](https://novita.ai) - رایگان برای شروع
+2. **OpenRouter**: [openrouter.ai](https://openrouter.ai) - پشتیبان
+
 ## آماده برای API
 
 کد به گونه‌ای نوشته شده که به راحتی می‌توانید API های واقعی را اضافه کنید. در هر بخش، توابع مربوط به API با کامنت TODO مشخص شده‌اند.
