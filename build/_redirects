@@ -1,0 +1,5 @@
+/*    /index.html   200
+
+# API proxy for CORS
+/api/*  https://openrouter.ai/api/:splat  200
+/novita/*  https://api.novita.ai/:splat  200
