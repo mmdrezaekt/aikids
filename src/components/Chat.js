@@ -20,16 +20,12 @@ const Chat = ({ onGenerationChange }) => {
     onGenerationChange && onGenerationChange(true);
     
     try {
-      // Add timeout to prevent hanging requests
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
-      
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer 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',
+          'Authorization': 'Bearer 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',
           'Content-Type': 'application/json',
-          'HTTP-Referer': process.env.NODE_ENV === 'production' ? 'https://your-app-name.netlify.app' : window.location.origin,
+          'HTTP-Referer': 'http://localhost:3000',
           'X-Title': 'AI Kids App'
         },
         body: JSON.stringify({
@@ -50,11 +46,8 @@ const Chat = ({ onGenerationChange }) => {
           ],
           max_tokens: 300,
           temperature: 0.7
-        }),
-        signal: controller.signal
+        })
       });
-      
-      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error(`API request failed: ${response.status}`);
@@ -67,59 +60,7 @@ const Chat = ({ onGenerationChange }) => {
       };
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
-      console.error('Error sending message with DeepSeek R1:', error);
-      
-      // Try fallback model if DeepSeek R1 fails
-      try {
-        console.log('Trying fallback model for chat...');
-        const fallbackResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': 'Bearer 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',
-            'Content-Type': 'application/json',
-            'HTTP-Referer': process.env.NODE_ENV === 'production' ? 'https://your-app-name.netlify.app' : window.location.origin,
-            'X-Title': 'AI Kids App'
-          },
-          body: JSON.stringify({
-            model: 'meta-llama/llama-3.1-8b-instruct:free',
-            messages: [
-              {
-                role: 'system',
-                content: 'You are a friendly AI assistant for children aged 4-10. Be kind, helpful, and use simple language. Answer questions in a fun and educational way. Keep responses short and engaging. Use emojis when appropriate to make conversations more fun!'
-              },
-              ...messages.map(msg => ({
-                role: msg.type === 'user' ? 'user' : 'assistant',
-                content: msg.content
-              })),
-              {
-                role: 'user',
-                content: userMessage.content
-              }
-            ],
-            max_tokens: 300,
-            temperature: 0.7
-          })
-        });
-        
-        if (fallbackResponse.ok) {
-          const fallbackData = await fallbackResponse.json();
-          if (fallbackData.choices && fallbackData.choices[0] && fallbackData.choices[0].message) {
-            const fallbackContent = fallbackData.choices[0].message.content;
-            if (fallbackContent && fallbackContent.trim() !== '') {
-              console.log('Fallback model succeeded for chat');
-              const aiResponse = {
-                type: 'ai',
-                content: fallbackContent
-              };
-              setMessages(prev => [...prev, aiResponse]);
-              return;
-            }
-          }
-        }
-      } catch (fallbackError) {
-        console.error('Fallback model also failed for chat:', fallbackError);
-      }
-      
+      console.error('Error sending message:', error);
       const aiResponse = {
         type: 'ai',
         content: "I'm sorry, I'm having trouble right now. But I'd love to chat with you! Try asking me something fun! 😊"

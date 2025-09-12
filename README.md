@@ -34,7 +34,6 @@
 
 ## نحوه اجرا
 
-### Development:
 1. نصب وابستگی‌ها:
 ```bash
 npm install
@@ -45,30 +44,10 @@ npm install
 npm start
 ```
 
-### Production (Netlify):
-1. ساخت نسخه تولید:
+3. ساخت نسخه تولید:
 ```bash
 npm run build
 ```
-
-2. فایل‌های build در پوشه `build` قرار می‌گیرند
-
-## Deployment روی Netlify
-
-### روش 1: Drag & Drop
-1. `npm run build` اجرا کنید
-2. پوشه `build` را به Netlify بکشید
-
-### روش 2: Git Integration
-1. کد را به GitHub push کنید
-2. در Netlify:
-   - Build command: `npm run build`
-   - Publish directory: `build`
-   - Node version: `18`
-
-### Environment Variables در Netlify:
-- `REACT_APP_OPENROUTER_API_KEY`: API key شما
-- `REACT_APP_NETLIFY_URL`: URL نهایی اپ
 
 ## ساختار پروژه
 
