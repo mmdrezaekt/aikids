@@ -21,9 +21,10 @@ const Image = ({ onGenerationChange }) => {
       console.log('Full prompt being sent:', fullPrompt);
       
       // Step 1: Create image generation task using Qwen-Image API
-      const createTaskResponse = await fetch('/.netlify/functions/novita-proxy', {
+      const createTaskResponse = await fetch('https://api.novita.ai/v3/async/qwen-image-txt2img', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${process.env.REACT_APP_NOVITA_API_KEY}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -53,8 +54,11 @@ const Image = ({ onGenerationChange }) => {
       while (attempts < maxAttempts) {
         await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
         
-        const taskResultResponse = await fetch(`/.netlify/functions/novita-proxy?task_id=${taskId}`, {
-          method: 'GET'
+        const taskResultResponse = await fetch(`https://api.novita.ai/v3/async/task-result?task_id=${taskId}`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${process.env.REACT_APP_NOVITA_API_KEY}`
+          }
         });
 
         if (!taskResultResponse.ok) {

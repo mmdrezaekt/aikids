@@ -20,10 +20,13 @@ const Chat = ({ onGenerationChange }) => {
     onGenerationChange && onGenerationChange(true);
     
     try {
-      const response = await fetch('/.netlify/functions/openrouter-proxy', {
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': window.location.origin,
+          'X-Title': 'AI Kids App'
         },
         body: JSON.stringify({
           model: 'deepseek/deepseek-r1:free',

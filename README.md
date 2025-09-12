@@ -1,39 +1,102 @@
 # AI Kids App
 
-## مشکلات رایج و راه‌حل‌ها
+یک اپلیکیشن موبایل React برای کودکان که با استفاده از هوش مصنوعی محتوا تولید می‌کند.
 
-### مشکل CORS در Firebase
-اگر با خطای CORS مواجه شدید:
+## ویژگی‌ها
 
-1. **Firebase Console:**
-   - به Authentication > Settings بروید
-   - در قسمت "Authorized domains" دامنه `aikidsapp.netlify.app` را اضافه کنید
+- 📚 **تولید داستان**: داستان‌های کودکانه با طول‌های مختلف
+- 💬 **چت با AI**: مکالمه تعاملی با هوش مصنوعی
+- 🖼️ **تولید تصویر**: تصاویر کودکانه و جذاب
+- 📋 **تاریخچه**: ذخیره و مدیریت محتویات تولید شده
 
-2. **Clear Cache:**
-   - مرورگر را refresh کنید
-   - یا از incognito mode استفاده کنید
+## تکنولوژی‌ها
 
-### مشکل API 404
-اگر API ها کار نمی‌کنند:
+- React 18.2.0
+- Firebase (Authentication, Firestore)
+- OpenRouter AI API
+- Novita AI API
+- Netlify
 
-1. **Netlify Functions:**
-   - اپ حالا از Netlify Functions استفاده می‌کند
-   - API calls از طریق `/.netlify/functions/` proxy می‌شوند
+## نصب و راه‌اندازی
 
-2. **Build جدید:**
-   ```bash
-   npm run build
-   ```
+### پیش‌نیازها
+- Node.js 18+
+- npm یا yarn
 
-3. **Deploy جدید:**
-   - فایل‌های build و netlify/functions را به Netlify آپلود کنید
+### نصب
+```bash
+npm install
+```
 
-### تست محلی
+### تنظیم Environment Variables
+فایل `.env` را در ریشه پروژه ایجاد کنید:
+
+```env
+REACT_APP_OPENROUTER_API_KEY=your_openrouter_api_key_here
+REACT_APP_NOVITA_API_KEY=your_novita_api_key_here
+```
+
+### اجرای محلی
 ```bash
 npm start
 ```
 
-### Build برای production
+### Build برای Production
 ```bash
 npm run build
 ```
+
+## دیپلوی روی Netlify
+
+### روش 1: از طریق Git
+1. پروژه را به GitHub push کنید
+2. در Netlify، "New site from Git" را انتخاب کنید
+3. Repository را انتخاب کنید
+4. Environment variables را تنظیم کنید:
+   - `REACT_APP_OPENROUTER_API_KEY`
+   - `REACT_APP_NOVITA_API_KEY`
+5. Deploy را کلیک کنید
+
+### روش 2: از طریق Netlify CLI
+```bash
+# نصب Netlify CLI
+npm install -g netlify-cli
+
+# ورود به Netlify
+netlify login
+
+# دیپلوی
+netlify deploy --prod --dir=build
+```
+
+### تنظیمات Environment Variables در Netlify
+1. به Site settings > Environment variables بروید
+2. متغیرهای زیر را اضافه کنید:
+   - `REACT_APP_OPENROUTER_API_KEY`
+   - `REACT_APP_NOVITA_API_KEY`
+
+## ساختار پروژه
+
+```
+src/
+├── components/          # کامپوننت‌های React
+│   ├── Story.js        # تولید داستان
+│   ├── Chat.js         # چت با AI
+│   ├── Image.js        # تولید تصویر
+│   ├── History.js      # تاریخچه محتویات
+│   └── FirebaseAdmin.js # پنل مدیریت
+├── contexts/           # Context API
+│   └── UserContext.js  # مدیریت کاربر
+├── firebase.js         # تنظیمات Firebase
+└── firebaseUtils.js    # توابع Firebase
+```
+
+## امنیت
+
+- API keys در environment variables ذخیره می‌شوند
+- Content Security Policy تنظیم شده
+- Firebase Security Rules فعال
+
+## مجوز
+
+MIT License
