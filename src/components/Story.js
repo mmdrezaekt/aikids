@@ -34,15 +34,41 @@ const Story = ({ onGenerationChange }) => {
           messages: [
             {
               role: 'system',
-              content: `You are a creative children's story writer. Write engaging, age-appropriate stories for children aged 4-10. Make the stories magical, fun, and educational. Use simple language and include positive messages. 
-              ${storyLength === 'short' ? 'Write a SHORT story with EXACTLY 2 paragraphs. Each paragraph must have EXACTLY 5 lines. Keep it simple and concise.' : 
-                storyLength === 'medium' ? 'Write a MEDIUM story with EXACTLY 5 paragraphs. Each paragraph must have EXACTLY 5 lines. Include some details and character development.' : 
-                'Write a LONG story with EXACTLY 10 paragraphs. Each paragraph must have EXACTLY 5 lines. Include rich details, character development, and a more complex plot.'} 
-              Always start with "Once upon a time" and end with "The end."`
+              content: `You are a magical storyteller who creates wonderful adventures for children aged 4-10. Your stories should be:
+
+🎭 CHARACTERISTICS:
+- Use simple, clear words that kids understand
+- Include fun characters like animals, fairies, or friendly monsters
+- Add magical elements and adventures
+- Teach good values like kindness, friendship, and courage
+- Make it exciting but never scary
+- Use lots of descriptive words to paint pictures in their minds
+
+📚 STORY STRUCTURE:
+${storyLength === 'short' ? 'Write a SHORT story with EXACTLY 2 paragraphs. Each paragraph must have EXACTLY 5 lines. Keep it simple and sweet like a bedtime story.' : 
+  storyLength === 'medium' ? 'Write a MEDIUM story with EXACTLY 5 paragraphs. Each paragraph must have EXACTLY 5 lines. Include fun characters, a little adventure, and a happy ending.' : 
+  'Write a LONG story with EXACTLY 10 paragraphs. Each paragraph must have EXACTLY 5 lines. Create an exciting adventure with multiple characters, challenges, and a wonderful ending.'}
+
+✨ SPECIAL RULES:
+- Always start with "Once upon a time" 
+- Always end with "The end."
+- Use emojis occasionally to make it more fun
+- Include dialogue between characters
+- Make the main character brave and kind
+- Add some humor that kids will giggle at`
             },
             {
               role: 'user',
-              content: `Write a magical children's story about: ${prompt}. Make it fun and educational for kids!`
+              content: `Create an amazing adventure story about: "${prompt}". 
+
+Make it magical and exciting! Include:
+🌟 A brave main character who learns something important
+🎪 Fun adventures and challenges to overcome  
+👫 Friendly characters who help along the way
+💫 Magical elements that make kids' eyes sparkle
+😊 A happy ending that makes everyone smile
+
+Remember: This story will be read by children who love adventure and magic!`
             }
           ],
           max_tokens: storyLength === 'short' ? 500 : storyLength === 'medium' ? 1000 : 2000,
@@ -88,7 +114,13 @@ const Story = ({ onGenerationChange }) => {
         errorMessage = 'Something went wrong. Please try again.';
       }
       
-      setGeneratedStory(`I'm sorry, ${errorMessage} But here's a magical story about ${prompt.toLowerCase()}: Once upon a time, there was a wonderful ${prompt.toLowerCase()} that lived in a magical world full of adventures and fun! The end.`);
+      setGeneratedStory(`Oops! Something went wrong while creating your story. 😅 But don't worry! Here's a special story just for you:
+
+Once upon a time, there was a wonderful ${prompt.toLowerCase()} who lived in a magical world full of adventures and fun! 🌟 This ${prompt.toLowerCase()} was the bravest and kindest in all the land, and every day brought new exciting adventures. All the other creatures loved playing with this amazing ${prompt.toLowerCase()}, and they all lived happily ever after! ✨
+
+The end. 
+
+(Don't worry, you can try again anytime! The magic will work next time! 🪄)`);
     } finally {
       setIsLoading(false);
       onGenerationChange && onGenerationChange(false);
