@@ -3,18 +3,6 @@
   command = "npm run build"
   functions = "netlify/functions"
 
-# API proxy for CORS issues using Netlify Functions
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/openrouter-proxy"
-  status = 200
-
-[[redirects]]
-  from = "/novita/*"
-  to = "/.netlify/functions/novita-proxy"
-  status = 200
-
-# SPA fallback
 [[redirects]]
   from = "/*"
   to = "/index.html"
@@ -27,6 +15,9 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"
 
 [[headers]]
   for = "/static/*"

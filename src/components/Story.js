@@ -23,13 +23,10 @@ const Story = ({ onGenerationChange }) => {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      const response = await fetch('/api/v1/chat/completions', {
+      const response = await fetch('/.netlify/functions/openrouter-proxy', {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer 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',
-          'Content-Type': 'application/json',
-          'HTTP-Referer': window.location.origin,
-          'X-Title': 'AI Kids App'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: 'deepseek/deepseek-r1:free',
