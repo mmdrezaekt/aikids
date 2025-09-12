@@ -24,7 +24,7 @@ const Image = ({ onGenerationChange }) => {
       const createTaskResponse = await fetch('https://api.novita.ai/v3/async/qwen-image-txt2img', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.REACT_APP_NOVITA_API_KEY}`,
+          'Authorization': 'Bearer sk_WHtMEr6fX8C6OStB14DhDZ7aKD1gbi_r5hHZ4JKtZYk',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -57,7 +57,7 @@ const Image = ({ onGenerationChange }) => {
         const taskResultResponse = await fetch(`https://api.novita.ai/v3/async/task-result?task_id=${taskId}`, {
           method: 'GET',
           headers: {
-            'Authorization': `Bearer ${process.env.REACT_APP_NOVITA_API_KEY}`
+            'Authorization': 'Bearer sk_WHtMEr6fX8C6OStB14DhDZ7aKD1gbi_r5hHZ4JKtZYk'
           }
         });
 

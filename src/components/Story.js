@@ -26,9 +26,9 @@ const Story = ({ onGenerationChange }) => {
       const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${process.env.REACT_APP_OPENROUTER_API_KEY}`,
+          'Authorization': 'Bearer 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',
           'Content-Type': 'application/json',
-          'HTTP-Referer': window.location.origin,
+          'HTTP-Referer': process.env.NODE_ENV === 'production' ? 'https://your-app-name.netlify.app' : window.location.origin,
           'X-Title': 'AI Kids App'
         },
         body: JSON.stringify({
@@ -56,7 +56,9 @@ const Story = ({ onGenerationChange }) => {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`API request failed: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
@@ -75,11 +77,60 @@ const Story = ({ onGenerationChange }) => {
       
       setGeneratedStory(generatedStory);
     } catch (error) {
-      console.error('Error generating story:', error);
+      console.error('Error generating story with DeepSeek R1:', error);
+      
+      // Try fallback model if DeepSeek R1 fails
+      try {
+        console.log('Trying fallback model...');
+        const fallbackResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer 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',
+            'Content-Type': 'application/json',
+            'HTTP-Referer': process.env.NODE_ENV === 'production' ? 'https://your-app-name.netlify.app' : window.location.origin,
+            'X-Title': 'AI Kids App'
+          },
+          body: JSON.stringify({
+            model: 'meta-llama/llama-3.1-8b-instruct:free',
+            messages: [
+              {
+                role: 'system',
+                content: `You are a creative children's story writer. Write engaging, age-appropriate stories for children aged 4-10. Make the stories magical, fun, and educational. Use simple language and include positive messages. 
+                ${storyLength === 'short' ? 'Write a SHORT story with EXACTLY 2 paragraphs. Each paragraph must have EXACTLY 5 lines. Keep it simple and concise.' : 
+                  storyLength === 'medium' ? 'Write a MEDIUM story with EXACTLY 5 paragraphs. Each paragraph must have EXACTLY 5 lines. Include some details and character development.' : 
+                  'Write a LONG story with EXACTLY 10 paragraphs. Each paragraph must have EXACTLY 5 lines. Include rich details, character development, and a more complex plot.'} 
+                Always start with "Once upon a time" and end with "The end."`
+              },
+              {
+                role: 'user',
+                content: `Write a magical children's story about: ${prompt}. Make it fun and educational for kids!`
+              }
+            ],
+            max_tokens: storyLength === 'short' ? 300 : storyLength === 'medium' ? 600 : 1000,
+            temperature: 0.8
+          })
+        });
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          if (fallbackData.choices && fallbackData.choices[0] && fallbackData.choices[0].message) {
+            const fallbackStory = fallbackData.choices[0].message.content;
+            if (fallbackStory && fallbackStory.trim() !== '') {
+              console.log('Fallback model succeeded');
+              setGeneratedStory(fallbackStory);
+              return;
+            }
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback model also failed:', fallbackError);
+      }
       
       let errorMessage = '';
       if (error.name === 'AbortError') {
         errorMessage = 'Story generation timed out. Please try again.';
+      } else if (error.message.includes('401')) {
+        errorMessage = 'Authentication failed. Please check API key.';
       } else if (error.message.includes('API request failed')) {
         errorMessage = 'Server error. Please try again later.';
       } else if (error.message.includes('Invalid API response')) {
