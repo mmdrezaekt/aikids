@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Story.css';
 import { saveStoryToFirebase } from '../firebaseUtils';
 import { useUser } from '../contexts/UserContext';
+import { cleanAIResponse } from '../utils/textUtils';
 
 const Story = ({ onGenerationChange }) => {
   const [prompt, setPrompt] = useState('');
@@ -30,7 +31,7 @@ const Story = ({ onGenerationChange }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'qwen/qwen3-4b-fp8',
+          model: 'meta-llama/llama-3.2-1b-instruct',
           messages: [
             {
               role: 'system',
@@ -90,12 +91,15 @@ Remember: This story will be read by children who love adventure and magic!`
         throw new Error('Invalid API response structure');
       }
       
-      const generatedStory = data.choices[0].message.content;
+      let generatedStory = data.choices[0].message.content;
       console.log('Generated Story:', generatedStory);
       
       if (!generatedStory || generatedStory.trim() === '') {
         throw new Error('Empty story generated');
       }
+      
+      // Clean the story by removing thinking patterns
+      generatedStory = cleanAIResponse(generatedStory);
       
       setGeneratedStory(generatedStory);
     } catch (error) {

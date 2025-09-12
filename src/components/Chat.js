@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Chat.css';
 import { saveChatToFirebase } from '../firebaseUtils';
 import { useUser } from '../contexts/UserContext';
+import { cleanAIResponse } from '../utils/textUtils';
 
 const Chat = ({ onGenerationChange }) => {
   const [message, setMessage] = useState('');
@@ -27,7 +28,7 @@ const Chat = ({ onGenerationChange }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'qwen/qwen3-4b-fp8',
+          model: 'meta-llama/llama-3.2-1b-instruct',
           messages: [
             {
               role: 'system',
@@ -75,9 +76,14 @@ Remember: You're talking to a child who might be shy, curious, or excited. Make 
       }
 
       const data = await response.json();
+      let aiContent = data.choices[0].message.content;
+      
+      // Clean the AI response by removing thinking patterns
+      aiContent = cleanAIResponse(aiContent);
+      
       const aiResponse = {
         type: 'ai',
-        content: data.choices[0].message.content
+        content: aiContent
       };
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
