@@ -28,7 +28,7 @@ const Story = ({ onGenerationChange }) => {
         headers: {
           'Authorization': 'Bearer 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',
           'Content-Type': 'application/json',
-          'HTTP-Referer': 'http://localhost:3000',
+          'HTTP-Referer': window.location.origin,
           'X-Title': 'AI Kids App'
         },
         body: JSON.stringify({
