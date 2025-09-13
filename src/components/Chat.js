@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Chat.css';
 import { saveChatToFirebase } from '../firebaseUtils';
 import { useUser } from '../contexts/UserContext';
@@ -9,6 +9,16 @@ const Chat = ({ onGenerationChange }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const { user, userData, updateStats } = useUser();
+  const messagesEndRef = useRef(null);
+
+  // Auto-scroll to bottom when new messages are added
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -180,6 +190,7 @@ Remember: You're talking to a child who might be shy, curious, or excited. Make 
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="chat-input-section">

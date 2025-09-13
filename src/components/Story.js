@@ -171,6 +171,176 @@ The end.
     }
   };
 
+  const handleCopyStory = async () => {
+    if (generatedStory) {
+      try {
+        // Check if clipboard API is available and we're in a secure context
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(generatedStory);
+          alert('Story copied to clipboard! 📋');
+        } else {
+          // Fallback method for mobile and older browsers
+          const textArea = document.createElement('textarea');
+          textArea.value = generatedStory;
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          textArea.style.opacity = '0';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+              alert('Story copied to clipboard! 📋');
+            } else {
+              throw new Error('Copy command failed');
+            }
+          } catch (err) {
+            console.error('Fallback copy failed:', err);
+            // Show the text in a modal for manual copying
+            showCopyModal();
+          }
+          
+          document.body.removeChild(textArea);
+        }
+      } catch (error) {
+        console.error('Error copying story:', error);
+        showCopyModal();
+      }
+    }
+  };
+
+  const showCopyModal = () => {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+    `;
+    
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 90%;
+      max-height: 80%;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '✕';
+    closeBtn.style.cssText = `
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+    
+    const title = document.createElement('h3');
+    title.textContent = 'Copy Story';
+    title.style.cssText = `
+      margin: 0 0 15px 0;
+      color: #1f2937;
+      font-size: 18px;
+    `;
+    
+    const instruction = document.createElement('p');
+    instruction.textContent = 'Select all text below and copy it:';
+    instruction.style.cssText = `
+      margin: 0 0 10px 0;
+      color: #666;
+      font-size: 14px;
+    `;
+    
+    const textDisplay = document.createElement('textarea');
+    textDisplay.value = generatedStory;
+    textDisplay.style.cssText = `
+      width: 100%;
+      height: 200px;
+      padding: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    `;
+    
+    const copyBtn = document.createElement('button');
+    copyBtn.textContent = 'Copy Text';
+    copyBtn.style.cssText = `
+      width: 100%;
+      padding: 12px;
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 10px;
+    `;
+    
+    copyBtn.onclick = () => {
+      textDisplay.select();
+      textDisplay.setSelectionRange(0, 99999);
+      try {
+        document.execCommand('copy');
+        copyBtn.textContent = 'Copied! ✓';
+        copyBtn.style.background = '#059669';
+        setTimeout(() => {
+          copyBtn.textContent = 'Copy Text';
+          copyBtn.style.background = '#10b981';
+        }, 2000);
+      } catch (err) {
+        alert('Please manually select and copy the text');
+      }
+    };
+    
+    closeBtn.onclick = () => {
+      document.body.removeChild(modal);
+    };
+    
+    modalContent.appendChild(closeBtn);
+    modalContent.appendChild(title);
+    modalContent.appendChild(instruction);
+    modalContent.appendChild(textDisplay);
+    modalContent.appendChild(copyBtn);
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+    
+    // Auto-select the text
+    setTimeout(() => {
+      textDisplay.focus();
+      textDisplay.select();
+    }, 100);
+  };
+
   return (
     <div className="story-container">
       <div className="section-header">
@@ -241,19 +411,33 @@ The end.
             </div>
           </div>
           
-          <button 
-            className="save-btn"
-            onClick={handleSaveStory}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-file-download">
-              <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-              <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-              <path d="M12 17v-6" />
-              <path d="M9.5 14.5l2.5 2.5l2.5 -2.5" />
-            </svg>
-            Save to History
-          </button>
+          <div className="story-actions">
+            <button 
+              className="copy-btn"
+              onClick={handleCopyStory}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-copy">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
+                <path d="M4 16c0 1.1 .9 2 2 2h8c1.1 0 2 -.9 2 -2v-8c0 -1.1 -.9 -2 -2 -2h-8c-1.1 0 -2 .9 -2 2z" />
+              </svg>
+              Copy Story
+            </button>
+            
+            <button 
+              className="save-btn"
+              onClick={handleSaveStory}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-file-download">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                <path d="M12 17v-6" />
+                <path d="M9.5 14.5l2.5 2.5l2.5 -2.5" />
+              </svg>
+              Save to History
+            </button>
+          </div>
         </div>
       )}
     </div>
