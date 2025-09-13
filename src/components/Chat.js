@@ -118,6 +118,20 @@ Remember: You're talking to a child who might be shy, curious, or excited. Make 
 
   const handleSaveChat = async () => {
     if (messages.length > 0) {
+      // Always save to localStorage first (this always works)
+      const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
+      const newItem = {
+        id: Date.now(),
+        type: 'chat',
+        content: messages.map(msg => `${msg.type}: ${msg.content}`).join('\n\n'),
+        prompt: 'Chat conversation',
+        timestamp: new Date().toISOString(),
+        savedLocally: true
+      };
+      history.unshift(newItem);
+      localStorage.setItem('aiKidsHistory', JSON.stringify(history));
+      
+      // Try to save to Firebase (optional)
       try {
         const chatData = {
           type: 'chat',
@@ -132,27 +146,16 @@ Remember: You're talking to a child who might be shy, curious, or excited. Make 
         
         await saveChatToFirebase(chatData);
         
-        // Update user stats
+        // Update user stats if Firebase works
         if (user) {
           await updateStats('chat');
         }
         
-        // Also save to localStorage for immediate display
-        const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
-        const newItem = {
-          id: Date.now(),
-          type: 'chat',
-          content: messages.map(msg => `${msg.type}: ${msg.content}`).join('\n\n'),
-          prompt: 'Chat conversation',
-          timestamp: new Date().toISOString()
-        };
-        history.unshift(newItem);
-        localStorage.setItem('aiKidsHistory', JSON.stringify(history));
-        
-        alert('Chat saved to Firebase and local history!');
+        alert('Chat saved successfully! (Local + Firebase)');
       } catch (error) {
-        console.error('Error saving chat:', error);
-        alert('Failed to save chat to Firebase, but saved locally.');
+        console.error('Error saving to Firebase:', error);
+        // Firebase failed, but local save already succeeded
+        alert('Chat saved locally! (Firebase unavailable)');
       }
     }
   };

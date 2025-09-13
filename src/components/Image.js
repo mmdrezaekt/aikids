@@ -105,6 +105,21 @@ const Image = ({ onGenerationChange }) => {
 
   const handleSaveImage = async () => {
     if (generatedImage) {
+      // Always save to localStorage first (this always works)
+      const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
+      const newItem = {
+        id: Date.now(),
+        type: 'image',
+        content: `Image: ${generatedImage.prompt}`,
+        prompt: generatedImage.prompt,
+        imageUrl: generatedImage.url,
+        timestamp: new Date().toISOString(),
+        savedLocally: true
+      };
+      history.unshift(newItem);
+      localStorage.setItem('aiKidsHistory', JSON.stringify(history));
+      
+      // Try to save to Firebase (optional)
       try {
         const imageData = {
           type: 'image',
@@ -119,28 +134,16 @@ const Image = ({ onGenerationChange }) => {
         
         await saveImageToFirebase(imageData);
         
-        // Update user stats
+        // Update user stats if Firebase works
         if (user) {
           await updateStats('image');
         }
         
-        // Also save to localStorage for immediate display
-        const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
-        const newItem = {
-          id: Date.now(),
-          type: 'image',
-          content: `Image: ${generatedImage.prompt}`,
-          prompt: generatedImage.prompt,
-          imageUrl: generatedImage.url,
-          timestamp: new Date().toISOString()
-        };
-        history.unshift(newItem);
-        localStorage.setItem('aiKidsHistory', JSON.stringify(history));
-        
-        alert('Image saved to Firebase and local history!');
+        alert('Image saved successfully! (Local + Firebase)');
       } catch (error) {
-        console.error('Error saving image:', error);
-        alert('Failed to save image to Firebase, but saved locally.');
+        console.error('Error saving to Firebase:', error);
+        // Firebase failed, but local save already succeeded
+        alert('Image saved locally! (Firebase unavailable)');
       }
     }
   };

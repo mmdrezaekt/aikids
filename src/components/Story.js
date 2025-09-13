@@ -142,6 +142,20 @@ The end.
 
   const handleSaveStory = async () => {
     if (generatedStory) {
+      // Always save to localStorage first (this always works)
+      const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
+      const newItem = {
+        id: Date.now(),
+        type: 'story',
+        content: generatedStory,
+        prompt: prompt,
+        timestamp: new Date().toISOString(),
+        savedLocally: true
+      };
+      history.unshift(newItem);
+      localStorage.setItem('aiKidsHistory', JSON.stringify(history));
+      
+      // Try to save to Firebase (optional)
       try {
         const storyData = {
           type: 'story',
@@ -155,27 +169,16 @@ The end.
         
         await saveStoryToFirebase(storyData);
         
-        // Update user stats
+        // Update user stats if Firebase works
         if (user) {
           await updateStats('story');
         }
         
-        // Also save to localStorage for immediate display
-        const history = JSON.parse(localStorage.getItem('aiKidsHistory') || '[]');
-        const newItem = {
-          id: Date.now(),
-          type: 'story',
-          content: generatedStory,
-          prompt: prompt,
-          timestamp: new Date().toISOString()
-        };
-        history.unshift(newItem);
-        localStorage.setItem('aiKidsHistory', JSON.stringify(history));
-        
-        showNotification('Story saved to Firebase and local history!', 'success');
+        showNotification('Story saved successfully! (Local + Firebase)', 'success');
       } catch (error) {
-        console.error('Error saving story:', error);
-        showNotification('Failed to save story to Firebase, but saved locally.', 'warning');
+        console.error('Error saving to Firebase:', error);
+        // Firebase failed, but local save already succeeded
+        showNotification('Story saved locally! (Firebase unavailable)', 'warning');
       }
     }
   };
