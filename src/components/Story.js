@@ -9,7 +9,16 @@ const Story = ({ onGenerationChange }) => {
   const [generatedStory, setGeneratedStory] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [storyLength, setStoryLength] = useState('medium');
+  const [notification, setNotification] = useState(null);
   const { user, userData, updateStats } = useUser();
+
+  // Show notification function
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
+  };
 
   const handleGenerateStory = async () => {
     if (!prompt.trim()) return;
@@ -163,248 +172,41 @@ The end.
         history.unshift(newItem);
         localStorage.setItem('aiKidsHistory', JSON.stringify(history));
         
-        alert('Story saved to Firebase and local history!');
+        showNotification('Story saved to Firebase and local history!', 'success');
       } catch (error) {
         console.error('Error saving story:', error);
-        alert('Failed to save story to Firebase, but saved locally.');
+        showNotification('Failed to save story to Firebase, but saved locally.', 'warning');
       }
     }
   };
 
   const handleCopyStory = async () => {
     if (generatedStory) {
-      // Always show the modal for mobile compatibility
-      showCopyModal();
-    }
-  };
-
-  const showCopyModal = () => {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 10000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 10px;
-      box-sizing: border-box;
-    `;
-    
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = `
-      background: white;
-      padding: 20px;
-      border-radius: 16px;
-      width: 100%;
-      max-width: 500px;
-      max-height: 90vh;
-      overflow-y: auto;
-      position: relative;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    `;
-    
-    const closeBtn = document.createElement('button');
-    closeBtn.innerHTML = '✕';
-    closeBtn.style.cssText = `
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 35px;
-      height: 35px;
-      cursor: pointer;
-      font-size: 18px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10001;
-    `;
-    
-    const title = document.createElement('h3');
-    title.textContent = '📋 Copy Your Story';
-    title.style.cssText = `
-      margin: 0 0 20px 0;
-      color: #1f2937;
-      font-size: 20px;
-      text-align: center;
-      font-weight: 600;
-    `;
-    
-    const instruction = document.createElement('div');
-    instruction.innerHTML = `
-      <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; text-align: center;">
-        📱 <strong>For Mobile:</strong> Long press on the text below and select "Copy"
-      </p>
-      <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; text-align: center;">
-        💻 <strong>For Desktop:</strong> Select all text (Ctrl+A) and copy (Ctrl+C)
-      </p>
-    `;
-    
-    const textDisplay = document.createElement('textarea');
-    textDisplay.value = generatedStory;
-    textDisplay.style.cssText = `
-      width: 100%;
-      height: 250px;
-      padding: 20px;
-      border: 2px solid #e5e7eb;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 16px;
-      line-height: 1.5;
-      resize: vertical;
-      margin-bottom: 20px;
-      box-sizing: border-box;
-      background: #f9fafb;
-    `;
-    
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.cssText = `
-      display: flex;
-      gap: 10px;
-      flex-direction: column;
-    `;
-    
-    const selectAllBtn = document.createElement('button');
-    selectAllBtn.textContent = '📋 Select All Text';
-    selectAllBtn.style.cssText = `
-      width: 100%;
-      padding: 15px;
-      background: #3b82f6;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    `;
-    
-    const copyBtn = document.createElement('button');
-    copyBtn.textContent = '📋 Copy to Clipboard';
-    copyBtn.style.cssText = `
-      width: 100%;
-      padding: 15px;
-      background: #10b981;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    `;
-    
-    const closeModalBtn = document.createElement('button');
-    closeModalBtn.textContent = '❌ Close';
-    closeModalBtn.style.cssText = `
-      width: 100%;
-      padding: 12px;
-      background: #6b7280;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    `;
-    
-    selectAllBtn.onclick = () => {
-      textDisplay.focus();
-      textDisplay.select();
-      selectAllBtn.textContent = '✅ Text Selected!';
-      selectAllBtn.style.background = '#1d4ed8';
-      setTimeout(() => {
-        selectAllBtn.textContent = '📋 Select All Text';
-        selectAllBtn.style.background = '#3b82f6';
-      }, 2000);
-    };
-    
-    copyBtn.onclick = async () => {
       try {
-        // Try modern clipboard API first
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(generatedStory);
-          copyBtn.textContent = '✅ Copied Successfully!';
-          copyBtn.style.background = '#059669';
-          setTimeout(() => {
-            copyBtn.textContent = '📋 Copy to Clipboard';
-            copyBtn.style.background = '#10b981';
-          }, 3000);
-        } else {
-          // Fallback for older browsers
-          textDisplay.select();
-          textDisplay.setSelectionRange(0, 99999);
-          const successful = document.execCommand('copy');
-          if (successful) {
-            copyBtn.textContent = '✅ Copied Successfully!';
-            copyBtn.style.background = '#059669';
-            setTimeout(() => {
-              copyBtn.textContent = '📋 Copy to Clipboard';
-              copyBtn.style.background = '#10b981';
-            }, 3000);
-          } else {
-            copyBtn.textContent = '⚠️ Please Copy Manually';
-            copyBtn.style.background = '#f59e0b';
-            setTimeout(() => {
-              copyBtn.textContent = '📋 Copy to Clipboard';
-              copyBtn.style.background = '#10b981';
-            }, 3000);
-          }
-        }
-      } catch (err) {
-        copyBtn.textContent = '⚠️ Please Copy Manually';
-        copyBtn.style.background = '#f59e0b';
-        setTimeout(() => {
-          copyBtn.textContent = '📋 Copy to Clipboard';
-          copyBtn.style.background = '#10b981';
-        }, 3000);
+        await navigator.clipboard.writeText(generatedStory);
+        showNotification('Story copied to clipboard! 📋', 'success');
+      } catch (error) {
+        console.error('Error copying story:', error);
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = generatedStory;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showNotification('Story copied to clipboard! 📋', 'success');
       }
-    };
-    
-    const closeModal = () => {
-      document.body.removeChild(modal);
-    };
-    
-    closeBtn.onclick = closeModal;
-    closeModalBtn.onclick = closeModal;
-    
-    // Close modal when clicking outside
-    modal.onclick = (e) => {
-      if (e.target === modal) {
-        closeModal();
-      }
-    };
-    
-    buttonContainer.appendChild(selectAllBtn);
-    buttonContainer.appendChild(copyBtn);
-    buttonContainer.appendChild(closeModalBtn);
-    
-    modalContent.appendChild(closeBtn);
-    modalContent.appendChild(title);
-    modalContent.appendChild(instruction);
-    modalContent.appendChild(textDisplay);
-    modalContent.appendChild(buttonContainer);
-    modal.appendChild(modalContent);
-    document.body.appendChild(modal);
-    
-    // Auto-select the text after a short delay
-    setTimeout(() => {
-      textDisplay.focus();
-      textDisplay.select();
-    }, 200);
+    }
   };
 
   return (
     <div className="story-container">
+      {notification && (
+        <div className={`notification ${notification.type}`}>
+          <span>{notification.message}</span>
+        </div>
+      )}
+      
       <div className="section-header">
         <h2>📚 Story Section</h2>
         <p>Generate engaging stories for children</p>
