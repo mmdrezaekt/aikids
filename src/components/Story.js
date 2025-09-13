@@ -173,42 +173,8 @@ The end.
 
   const handleCopyStory = async () => {
     if (generatedStory) {
-      try {
-        // Check if clipboard API is available and we're in a secure context
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(generatedStory);
-          alert('Story copied to clipboard! 📋');
-        } else {
-          // Fallback method for mobile and older browsers
-          const textArea = document.createElement('textarea');
-          textArea.value = generatedStory;
-          textArea.style.position = 'fixed';
-          textArea.style.left = '-999999px';
-          textArea.style.top = '-999999px';
-          textArea.style.opacity = '0';
-          document.body.appendChild(textArea);
-          textArea.focus();
-          textArea.select();
-          
-          try {
-            const successful = document.execCommand('copy');
-            if (successful) {
-              alert('Story copied to clipboard! 📋');
-            } else {
-              throw new Error('Copy command failed');
-            }
-          } catch (err) {
-            console.error('Fallback copy failed:', err);
-            // Show the text in a modal for manual copying
-            showCopyModal();
-          }
-          
-          document.body.removeChild(textArea);
-        }
-      } catch (error) {
-        console.error('Error copying story:', error);
-        showCopyModal();
-      }
+      // Always show the modal for mobile compatibility
+      showCopyModal();
     }
   };
 
@@ -220,12 +186,12 @@ The end.
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.9);
       z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 10px;
       box-sizing: border-box;
     `;
     
@@ -233,112 +199,208 @@ The end.
     modalContent.style.cssText = `
       background: white;
       padding: 20px;
-      border-radius: 12px;
-      max-width: 90%;
-      max-height: 80%;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
       overflow-y: auto;
       position: relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     `;
     
     const closeBtn = document.createElement('button');
     closeBtn.innerHTML = '✕';
     closeBtn.style.cssText = `
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 15px;
+      right: 15px;
       background: #ef4444;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 30px;
-      height: 30px;
+      width: 35px;
+      height: 35px;
       cursor: pointer;
-      font-size: 16px;
+      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 10001;
     `;
     
     const title = document.createElement('h3');
-    title.textContent = 'Copy Story';
+    title.textContent = '📋 Copy Your Story';
     title.style.cssText = `
-      margin: 0 0 15px 0;
+      margin: 0 0 20px 0;
       color: #1f2937;
-      font-size: 18px;
+      font-size: 20px;
+      text-align: center;
+      font-weight: 600;
     `;
     
-    const instruction = document.createElement('p');
-    instruction.textContent = 'Select all text below and copy it:';
-    instruction.style.cssText = `
-      margin: 0 0 10px 0;
-      color: #666;
-      font-size: 14px;
+    const instruction = document.createElement('div');
+    instruction.innerHTML = `
+      <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; text-align: center;">
+        📱 <strong>For Mobile:</strong> Long press on the text below and select "Copy"
+      </p>
+      <p style="margin: 0 0 15px 0; color: #666; font-size: 14px; text-align: center;">
+        💻 <strong>For Desktop:</strong> Select all text (Ctrl+A) and copy (Ctrl+C)
+      </p>
     `;
     
     const textDisplay = document.createElement('textarea');
     textDisplay.value = generatedStory;
     textDisplay.style.cssText = `
       width: 100%;
-      height: 200px;
-      padding: 15px;
+      height: 250px;
+      padding: 20px;
       border: 2px solid #e5e7eb;
-      border-radius: 8px;
+      border-radius: 12px;
       font-family: inherit;
-      font-size: 14px;
+      font-size: 16px;
+      line-height: 1.5;
       resize: vertical;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
       box-sizing: border-box;
+      background: #f9fafb;
+    `;
+    
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+      display: flex;
+      gap: 10px;
+      flex-direction: column;
+    `;
+    
+    const selectAllBtn = document.createElement('button');
+    selectAllBtn.textContent = '📋 Select All Text';
+    selectAllBtn.style.cssText = `
+      width: 100%;
+      padding: 15px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
     `;
     
     const copyBtn = document.createElement('button');
-    copyBtn.textContent = 'Copy Text';
+    copyBtn.textContent = '📋 Copy to Clipboard';
     copyBtn.style.cssText = `
       width: 100%;
-      padding: 12px;
+      padding: 15px;
       background: #10b981;
       color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    `;
+    
+    const closeModalBtn = document.createElement('button');
+    closeModalBtn.textContent = '❌ Close';
+    closeModalBtn.style.cssText = `
+      width: 100%;
+      padding: 12px;
+      background: #6b7280;
+      color: white;
+      border: none;
+      border-radius: 10px;
       font-size: 14px;
       font-weight: 500;
       cursor: pointer;
-      margin-bottom: 10px;
+      transition: all 0.2s ease;
     `;
     
-    copyBtn.onclick = () => {
+    selectAllBtn.onclick = () => {
+      textDisplay.focus();
       textDisplay.select();
-      textDisplay.setSelectionRange(0, 99999);
+      selectAllBtn.textContent = '✅ Text Selected!';
+      selectAllBtn.style.background = '#1d4ed8';
+      setTimeout(() => {
+        selectAllBtn.textContent = '📋 Select All Text';
+        selectAllBtn.style.background = '#3b82f6';
+      }, 2000);
+    };
+    
+    copyBtn.onclick = async () => {
       try {
-        document.execCommand('copy');
-        copyBtn.textContent = 'Copied! ✓';
-        copyBtn.style.background = '#059669';
-        setTimeout(() => {
-          copyBtn.textContent = 'Copy Text';
-          copyBtn.style.background = '#10b981';
-        }, 2000);
+        // Try modern clipboard API first
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(generatedStory);
+          copyBtn.textContent = '✅ Copied Successfully!';
+          copyBtn.style.background = '#059669';
+          setTimeout(() => {
+            copyBtn.textContent = '📋 Copy to Clipboard';
+            copyBtn.style.background = '#10b981';
+          }, 3000);
+        } else {
+          // Fallback for older browsers
+          textDisplay.select();
+          textDisplay.setSelectionRange(0, 99999);
+          const successful = document.execCommand('copy');
+          if (successful) {
+            copyBtn.textContent = '✅ Copied Successfully!';
+            copyBtn.style.background = '#059669';
+            setTimeout(() => {
+              copyBtn.textContent = '📋 Copy to Clipboard';
+              copyBtn.style.background = '#10b981';
+            }, 3000);
+          } else {
+            copyBtn.textContent = '⚠️ Please Copy Manually';
+            copyBtn.style.background = '#f59e0b';
+            setTimeout(() => {
+              copyBtn.textContent = '📋 Copy to Clipboard';
+              copyBtn.style.background = '#10b981';
+            }, 3000);
+          }
+        }
       } catch (err) {
-        alert('Please manually select and copy the text');
+        copyBtn.textContent = '⚠️ Please Copy Manually';
+        copyBtn.style.background = '#f59e0b';
+        setTimeout(() => {
+          copyBtn.textContent = '📋 Copy to Clipboard';
+          copyBtn.style.background = '#10b981';
+        }, 3000);
       }
     };
     
-    closeBtn.onclick = () => {
+    const closeModal = () => {
       document.body.removeChild(modal);
     };
+    
+    closeBtn.onclick = closeModal;
+    closeModalBtn.onclick = closeModal;
+    
+    // Close modal when clicking outside
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    };
+    
+    buttonContainer.appendChild(selectAllBtn);
+    buttonContainer.appendChild(copyBtn);
+    buttonContainer.appendChild(closeModalBtn);
     
     modalContent.appendChild(closeBtn);
     modalContent.appendChild(title);
     modalContent.appendChild(instruction);
     modalContent.appendChild(textDisplay);
-    modalContent.appendChild(copyBtn);
+    modalContent.appendChild(buttonContainer);
     modal.appendChild(modalContent);
     document.body.appendChild(modal);
     
-    // Auto-select the text
+    // Auto-select the text after a short delay
     setTimeout(() => {
       textDisplay.focus();
       textDisplay.select();
-    }, 100);
+    }, 200);
   };
 
   return (
