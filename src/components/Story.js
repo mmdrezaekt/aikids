@@ -174,11 +174,11 @@ The end.
           await updateStats('story');
         }
         
-        showNotification('Story saved successfully! (Local + Firebase)', 'success');
+        showNotification('Story saved successfully!', 'success');
       } catch (error) {
         console.error('Error saving to Firebase:', error);
         // Firebase failed, but local save already succeeded
-        showNotification('Story saved locally! (Firebase unavailable)', 'warning');
+        showNotification('Story saved successfully!', 'success');
       }
     }
   };

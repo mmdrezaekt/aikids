@@ -139,11 +139,11 @@ const Image = ({ onGenerationChange }) => {
           await updateStats('image');
         }
         
-        alert('Image saved successfully! (Local + Firebase)');
+        alert('Image saved successfully!');
       } catch (error) {
         console.error('Error saving to Firebase:', error);
         // Firebase failed, but local save already succeeded
-        alert('Image saved locally! (Firebase unavailable)');
+        alert('Image saved successfully!');
       }
     }
   };

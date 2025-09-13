@@ -151,11 +151,11 @@ Remember: You're talking to a child who might be shy, curious, or excited. Make 
           await updateStats('chat');
         }
         
-        alert('Chat saved successfully! (Local + Firebase)');
+        alert('Chat saved successfully!');
       } catch (error) {
         console.error('Error saving to Firebase:', error);
         // Firebase failed, but local save already succeeded
-        alert('Chat saved locally! (Firebase unavailable)');
+        alert('Chat saved successfully!');
       }
     }
   };
