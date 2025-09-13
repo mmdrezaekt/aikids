@@ -1,5 +1,6 @@
 # AI Kids - اپ موبایل برای کودکان
 
+https://aikidsapp.netlify.app/
 
 
 ## بخش‌های اپ
