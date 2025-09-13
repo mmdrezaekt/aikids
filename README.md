@@ -56,11 +56,9 @@ src/
 برای استفاده از API ها، فایل `.env.local`:
 
 ```bash
-# Novita API Key (برای تولید متن و تصویر)
+# Novita API Key 
 REACT_APP_NOVITA_API_KEY=your_novita_api_key_here
 
-# OpenRouter API Key (پشتیبان)
-REACT_APP_OPENROUTER_API_KEY=your_openrouter_api_key_here
 ```
 
 ### نحوه دریافت API Key:
